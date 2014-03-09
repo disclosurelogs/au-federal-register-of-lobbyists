@@ -60,4 +60,6 @@ def get_data(id):
 
 for id in get_ids():
     data = get_data(id)
+    for key in data:
+        data[key] = data[key].decode("utf8") 
     scraperwiki.sqlite.save(unique_keys=["abn"], data=data, table_name="lobbyist_firms")
