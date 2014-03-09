@@ -48,8 +48,8 @@ def get_data(id):
     owner_ul = re.search(r'<h2>Owner Details</h2>\s+<ul>(.*?)<\/ul>', page, re.S).groups()[0]
     for owner_name in re.findall(r'<li>(.*?)<\/li>', owner_ul, re.S):
 	owner = {'lobbyist_name': business_entity_name, 'lobbyist_abn': abn, 'owner_name':owner_name}
-            for key in owner:
-                owner[key] = owner[key].decode("utf8") 
+        for key in owner:
+            owner[key] = owner[key].decode("utf8") 
         scraperwiki.sqlite.save(unique_keys=["lobbyist_abn","owner_name"], data=owner, table_name="lobbyist_firm_owners")
 
     return {'business_entity_name': business_entity_name,
