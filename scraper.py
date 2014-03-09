@@ -28,9 +28,12 @@ def get_data(id):
     lobby = re.search(r'<table border="0" cellpadding="4" cellspacing="1" id="lobbyistDetails"  class="tablesorter">(.*?)<\/table>', page, re.S)
     if lobby != None:
         lobbyist_table = lobby.groups()[0]
-        lobbyist_list = [dict(zip(['num', 'name', 'title', 'formergovrep', 'govrepceasedate'], row)) for row in re.findall(r'<td>(\d+)<\/td>\s+<td>(.*?)<\/td>\s+<td>(.*?)<\/td>\s+<td align="center">(.*?)<\/td>\s+<td align="center">(.*?)<\/td>', lobbyist_table)]
-    else:
-        lobbyist_list = []
+	for row in re.findall(r'<td>(\d+)<\/td>\s+<td>(.*?)<\/td>\s+<td>(.*?)<\/td>\s+<td align="center">(.*?)<\/td>\s+<td align="center">(.*?)<\/td>', lobbyist_table):
+		lobbyist = dict(zip(['num', 'lobbyist_name', 'lobbyist_title', 'lobbyist_formergovrep', 'lobbyist_govrepceasedate'], row)) 
+		lobbyist['lobbyist_abn'] = abn
+		for key in lobbyist:
+			lobbyist[key] = lobbyist[key].decode("utf8") 
+		scraperwiki.sqlite.save(unique_keys=["lobbyist_abn","lobbyist_name"], data=lobbyist, table_name="lobbyists")
 
     clients = re.search(r'<table border="0" cellpadding="4" cellspacing="1" id="clientDetails"  class="tablesorter">(.*?)<\/table>', page, re.S)
     if clients != None:
@@ -38,19 +41,23 @@ def get_data(id):
         for row in re.findall(r'<td>(\d+)<\/td>\s+<td>(.*?)<\/td>', clients_table):
             (rownum,client_name) = row
             client = {'lobbyist_name': business_entity_name, 'lobbyist_abn': abn, 'client_name':client_name}
+	    for key in client:
+                client[key] = client[key].decode("utf8") 
             scraperwiki.sqlite.save(unique_keys=["lobbyist_abn","client_name"], data=client, table_name="lobbyist_clients") 
 
     owner_ul = re.search(r'<h2>Owner Details</h2>\s+<ul>(.*?)<\/ul>', page, re.S).groups()[0]
-    owners = re.findall(r'<li>(.*?)<\/li>', owner_ul, re.S)
+    for owner_name in re.findall(r'<li>(.*?)<\/li>', owner_ul, re.S):
+	owner = {'lobbyist_name': business_entity_name, 'lobbyist_abn': abn, 'owner_name':owner_name}
+            for key in owner:
+                owner[key] = owner[key].decode("utf8") 
+        scraperwiki.sqlite.save(unique_keys=["lobbyist_abn","owner_name"], data=owner, table_name="lobbyist_firm_owners")
 
     return {'business_entity_name': business_entity_name,
             'abn': abn,
             'last_updated': last_updated,
             'trading_name': trading_name,
-            'lobbyists': lobbyist_list,
-            'owner_details': owners, 
             }
 
 for id in get_ids():
     data = get_data(id)
-    scraperwiki.sqlite.save(unique_keys=["abn"], data=data, table_name="lobbyists")
+    scraperwiki.sqlite.save(unique_keys=["abn"], data=data, table_name="lobbyist_firms")
