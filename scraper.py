@@ -20,7 +20,9 @@ def get_data(id):
     page = scraperwiki.scrape(url)
 
     business_entity_name = re.search(r'Business Entity Name:<\/strong>(.*?)<\/li>', page).groups()[0].strip()
-    last_updated = re.search(r'The information above was last updated on (.*?)\.<\/p>', page).groups()[0].strip()
+    last_updated = ""
+    if re.search(r'The information above was last updated on (.*?)\.<\/p>', page):
+        last_updated = re.search(r'The information above was last updated on (.*?)\.<\/p>', page).groups()[0].strip()
 
     abn = re.search(r'A.B.N:<\/strong>(.*?)<\/li>', page).groups()[0].strip()
     trading_name = re.search(r'Trading Name:<\/strong>(.*?)<\/li>', page).groups()[0].strip()
