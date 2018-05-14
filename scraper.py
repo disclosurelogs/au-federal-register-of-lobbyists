@@ -8,13 +8,13 @@ import re
 
 
 def get_ids():
-    url = 'http://lobbyists.pmc.gov.au/who_register.cfm'
+    url = 'https://lobbyists.pmc.gov.au/who_register.cfm'
     page = scraperwiki.scrape(url)
     return set(re.findall(r'\?id=(?P<id>\d+)', page))
 
 
 def get_data(id):
-    url = 'http://lobbyists.pmc.gov.au/register/view_agency.cfm?id=%s' % id
+    url = 'https://lobbyists.pmc.gov.au/register/view_agency.cfm?id=%s' % id
     #page = urllib2.urlopen(url).read()
     print url
     page = scraperwiki.scrape(url)
